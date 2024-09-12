@@ -31,6 +31,7 @@ int main(void) {
 	else if (cac == 4) {
 		printf("%lf / %lf = %lf", num1, num2, num1 / num2);
 	}
+	
 
 	return 0;
 }
