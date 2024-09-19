@@ -17,11 +17,11 @@ int main() {
 
 int PrimeNum(int num) {
 	int sum = 0;
-	for (int i = 1; i <= num; i++) {
+	for (int i = 2; i <= num; i++) {
 		if (num % i == 0)
 			sum++;
 	}
-	if (sum == 2)
+	if (sum == 1)
 		return 1;
 	else
 		return 0;
