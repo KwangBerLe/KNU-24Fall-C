@@ -59,6 +59,5 @@ int main() {
 	free(score);
 	for (int i = 0; i < input; i++) free(name[i]);
 	//free(name);											name 다중포인터 사용안할시 코드
-	
 	return 0;
 }
