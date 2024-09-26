@@ -61,5 +61,4 @@ int main() {
 	//free(name);											name 다중포인터 사용안할시 코드
 	
 	return 0;
-	
 }
