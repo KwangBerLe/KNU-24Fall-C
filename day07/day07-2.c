@@ -23,7 +23,7 @@ int main(void) {
 
 		count++;							// circle 증감식이 끝났으니 카운트 증가
 
-		if (count % 10000000 == 0 || count == 0) {		//진행도 표시 조건 1천만으로 설정.. 단 0일때는 출력하면 안되니 && 으로 예외처리 
+		if (count % 10000000 == 0) {		//진행도 표시 조건 1천만으로 설정.. 단 0일때는 출력하면 안되니 && 으로 예외처리 
 			perc++;
 			pi = 4.0 * ((double)circle / (double)count);
 			printf("%3d\%% 진행.. 원주율 : %f ", perc, pi);
