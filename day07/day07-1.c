@@ -16,6 +16,6 @@ int main(void) {
 		printf("\n");
 	}
 
-	printf("\n출력완료. 프로그램을 종료합니다.");
+	printf("\n출력완료. 프로그램을 종료합니다. ");
 	return 0;
 }
