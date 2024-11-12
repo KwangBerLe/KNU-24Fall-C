@@ -23,14 +23,6 @@ struct NODE* create_node(char name[20], int data) {
 	return new_node;
 }
 
-struct NODE* sortedIn() {
-	struct NODE* cur = head;
-	while (cur->link != NULL) {
-		cur = cur->link;
-	}
-	return cur;
-}
-
 int comp_node(int n1, int n2) {
 	if (n1 < n2) 
 		return 1;
