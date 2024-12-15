@@ -1,4 +1,4 @@
-// C program to build the complete 
+ï»¿// C program to build the complete 
 // snake game 
 #include <conio.h> 
 #include <stdio.h> 
@@ -9,12 +9,13 @@
 int i, j, height = 20, width = 20;
 int gameover, score;
 int x, y, fruitx, fruity, flag;
+void game_draw();
 
-void SetColor(int color) {			//ÄÃ·¯ ÁöÁ¤
+void SetColor(int color) {			//ì»¬ëŸ¬ ì§€ì •(í¬ë¡¤ë§)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
-} 
+}
 
-void CursorView(char show)
+void CursorView(char show)			//ì»¤ì„œê°€ ì•ˆë³´ì´ê²Œ í•´ì£¼ëŠ” í•¨ìˆ˜(í¬ë¡¤ë§)
 {
 	HANDLE hConsole;
 	CONSOLE_CURSOR_INFO ConsoleCursor;
@@ -27,49 +28,61 @@ void CursorView(char show)
 	SetConsoleCursorInfo(hConsole, &ConsoleCursor);
 }
 
-void gotoxy(int x, int y) {			//UI ±¸Çö¿¡ »ç¿ëÇÏ´Â Æ÷Áö¼Ç ÀÌµ¿
+void gotoxy(int x, int y) {			//UI êµ¬í˜„ì— ì‚¬ìš©í•˜ëŠ” í¬ì§€ì…˜ ì´ë™(í¬ë¡¤ë§)
 	COORD pos = { x, y };
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), pos);
 }
 
-void start_screen_print() {	//½ÃÀÛÈ­¸é Ãâ·Â
-	printf("\n\n\n\n");
-	printf("																	\n");
-	printf("																	\n");
-	printf("							SNAKE °ÔÀÓ						\n");
-	printf("																	\n");
-	printf("																	\n");
+void start_screen_print() {	//ì‹œì‘í™”ë©´ ì¶œë ¥
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	gotoxy(21, 4); printf("SNAKE ê²Œì„ ");
+	gotoxy(12, 7); printf("ê³„ì†í•˜ë ¤ë©´ ì•„ë¬´í‚¤ë‚˜ ëˆŒëŸ¬ì£¼ì„¸ìš”.");
+	
 
-	printf("\n\n\n");
-	printf("																°è¼ÓÇÏ·Á¸é ¾Æ¹« Å°³ª ÀÔ·ÂÇØÁÖ¼¼¿ä.									");
-
-	int i = 0;
+	int start_input = 0;
 	while (1) {
-		i = _getch();
-			if (i >= 1) {
-				system("cls");
-				i = 0;
-				break;
+		start_input = _getch();		//ì•„ë¬´ ì…ë ¥ì„ ë°›ì•„ì˜µë‹ˆë‹¤
+		if (start_input >= 1) {		//ë¬´ìŠ¨ ì…ë ¥ì„ ë°›ë˜ ê°„ì— start_inputì€ 1ë³´ë‹¤ ì»¤ì§€ê²Œ ë˜ìˆìŠµë‹ˆë‹¤
+			system("cls");	
+			start_input = 0;			//i ì´ˆê¸°í™”
+			break;
 		}
 	}
 }
 
+void quit_game() {
+	system("cls");
+	gotoxy(25, 6); printf("ê²Œì„ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.");
+	gotoxy(25, 10);
+	gameover = 1;
+	exit(0);
+}
+
 void main_print() {
 	CursorView(0);
-	puts("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	puts("¡á                                                   ¡á");
-	printf("¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á¡á");
-	gotoxy(7, 4); printf("»õ·Î ÇÏ±â");
-	gotoxy(21, 4); printf("·©Å· º¸±â");
-	gotoxy(35, 4); printf("°ÔÀÓ Á¾·á");
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	gotoxy(7, 4); printf("ìƒˆë¡œ í•˜ê¸°");
+	gotoxy(21, 4); printf("ë­í‚¹ ë³´ê¸°");
+	gotoxy(35, 4); printf("ê²Œì„ ì¢…ë£Œ");
+	gotoxy(6, 7); printf("ENTER : ë©”ë‰´ì„ íƒ      ë°©í–¥í‚¤ : ë©”ë‰´ ì´ë™");
 
-	int POS = 3;
+	int POS = 0;
 	while (1) {
 		if (GetAsyncKeyState(VK_LEFT))
 			if (POS == 0) POS = 2;
@@ -77,32 +90,44 @@ void main_print() {
 		else if (GetAsyncKeyState(VK_RIGHT))
 			if (POS == 2 || POS == 4) POS = 0;
 			else POS += 1;
-		else if (GetAsyncKeyState(VK_RETURN))	//¿£ÅÍ¸¦ ´­·¶À» ¶§
-			break;
+		else if (GetAsyncKeyState(VK_RETURN)) {	//ì—”í„°ë¥¼ ëˆŒë €ì„ ë•Œ
+			if (POS == 0) {
+				system("cls");
+				game_draw();
+				break;
+			}
+			//else if (POS == 1) rank_print();
+			else if (POS == 2) {
+				quit_game();
+				gameover = 1;
+				break;
+			}
+		}
 		switch (POS) {
 		case 0:
 			SetColor(11);
-			gotoxy(7, 4); printf("»õ·Î ÇÏ±â");
+			gotoxy(7, 4); printf("ìƒˆë¡œ í•˜ê¸°");
 			SetColor(15);
-			gotoxy(21, 4); printf("·©Å· º¸±â");
-			gotoxy(35, 4); printf("°ÔÀÓ Á¾·á");
+			gotoxy(21, 4); printf("ë­í‚¹ ë³´ê¸°");
+			gotoxy(35, 4); printf("ê²Œì„ ì¢…ë£Œ");
 			break;
 
 		case 1:
 			SetColor(15);
-			gotoxy(7, 4); printf("»õ·Î ÇÏ±â");
+			gotoxy(7, 4); printf("ìƒˆë¡œ í•˜ê¸°");
 			SetColor(11);
-			gotoxy(21, 4); printf("·©Å· º¸±â");
+			gotoxy(21, 4); printf("ë­í‚¹ ë³´ê¸°");
 			SetColor(15);
-			gotoxy(35, 4); printf("°ÔÀÓ Á¾·á");
+			gotoxy(35, 4); printf("ê²Œì„ ì¢…ë£Œ");
 			break;
 
 		case 2:
 			SetColor(15);
-			gotoxy(7, 4); printf("»õ·Î ÇÏ±â");
-			gotoxy(21, 4); printf("·©Å· º¸±â");
+			gotoxy(7, 4); printf("ìƒˆë¡œ í•˜ê¸°");
+			gotoxy(21, 4); printf("ë­í‚¹ ë³´ê¸°");
 			SetColor(11);
-			gotoxy(35, 4); printf("°ÔÀÓ Á¾·á");
+			gotoxy(35, 4); printf("ê²Œì„ ì¢…ë£Œ");
+			SetColor(15);
 			break;
 
 		default: break;
@@ -111,9 +136,30 @@ void main_print() {
 	}
 }
 
-void gameover_print(int score) {	//°ÔÀÓ ¿À¹ö½Ã ÃÖÁ¾Á¡¼ö ÀúÀå
+void gameover_print(int score) {	//ê²Œì„ ì˜¤ë²„ì‹œ ìµœì¢…ì ìˆ˜ ì €ì¥
 	system("cls");
-	printf("ÃÖÁ¾Á¡¼ö : %d", score);
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â–                                                    â– ");
+	puts("â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– â– ");
+	gotoxy(21, 2); printf("GAME OVER");
+	gotoxy(19, 4); printf("ìµœì¢… ì ìˆ˜ : %d", score);
+	gotoxy(12, 6); printf("ê³„ì†í•˜ë ¤ë©´ X í‚¤ë¥¼ ëˆŒëŸ¬ì£¼ì„¸ìš”.");
+	
+	
+	while (1) {
+		int go_input = 0;
+		go_input = _getch();
+		if (go_input == 120) {
+			system("cls");
+			main_print();
+		}
+	}
 }
 
 // Function to generate the fruit 
@@ -128,12 +174,12 @@ void setup()
 
 	fruitx = 0;
 	while (fruitx == 0) {
-		fruitx = rand() % 20;
+		fruitx = rand() % 19;
 	}
 
 	fruity = 0;
 	while (fruity == 0) {
-		fruity = rand() % 20;
+		fruity = rand() % 19;
 	}
 
 	score = 0;
@@ -142,22 +188,23 @@ void setup()
 // Function to draw the boundaries 
 void draw()
 {
-	system("cls");										//È­¸éÀ» °è¼Ó Áö¿ì¸ç º®, °úÀÏ, ÇÃ·¹ÀÌ¾î¸¦ Ãâ·Â(ÀÌ³à¼®ÀÌ È­¸éÀ» ±ôºıÀÌ°Ô ÇÏ´Â ¿øÀÎ)
+	//system("cls");	í™”ë©´ì„ ê³„ì† ì§€ìš°ë©° ë²½, ê³¼ì¼, í”Œë ˆì´ì–´ë¥¼ ì¶œë ¥(ì´ë…€ì„ì´ í™”ë©´ì„ ê¹œë¹¡ì´ê²Œ í•˜ëŠ” ì›ì¸)
+	gotoxy(0, 0); //í¬ë¡¤ë§ í•´ì˜¨ gotoxy í•¨ìˆ˜ë¥¼ í†µí•´ í™”ë©´ì„ ì§€ìš°ì§€ ì•Šê³  ê·¸ëŒ€ë¡œ ë®ì–´ì”Œìš°ëŠ” í˜•ì‹ìœ¼ë¡œ ì‘ë™í•˜ê²Œ í•˜ì—¬ í™”ë©´ ë²„í¼ë§ì„ ì—†ì• ì¤€ë‹¤.
 	for (i = 0; i < height; i++) {
 		for (j = 0; j < width; j++) {
-			if (i == 0 || i == width - 1
-				|| j == 0
-				|| j == height - 1) {
-				printf("#");
+			if (i == 0 || i == width - 1) 
+				printf("ã…¡");
+			else if (j == 0 || j == height - 1) {
+				printf("ã…£");
 			}
 			else {
 				if (i == x && j == y)
 					printf("0");
 				else if (i == fruitx
 					&& j == fruity)
-					printf("¡Ù");
+					printf("!");
 				else
-					printf(" ");
+					printf("ã€€");
 			}
 		}
 		printf("\n");
@@ -188,7 +235,7 @@ void input()
 			flag = 4;
 			break;
 		case 'x':
-			gameover = 1;
+			gameover_print(score);
 			break;
 		}
 	}
@@ -222,8 +269,8 @@ void logic()
 		gameover_print(score);
 		gameover = 1;
 	}
-	//	¹ìÀÌ °úÀÏ ¼·Ãë½Ã
-	// Á¡¼ö ¾÷µ¥ÀÌÆ®
+	//	ë±€ì´ ê³¼ì¼ ì„­ì·¨ì‹œ
+	// ì ìˆ˜ ì—…ë°ì´íŠ¸
 	if (x == fruitx && y == fruity) {
 
 		fruitx = 0;
@@ -240,21 +287,22 @@ void logic()
 	}
 }
 
+void game_draw() {
+	setup();
+	flag = 0;
+	while (1) {
+		// Function Call 
+		draw();
+		input();
+		logic();
+	}
+};
+
 void main()
 {
 	int m, n;
 
 	start_screen_print();
 	main_print();
-	// Generate boundary 
-	setup();
-
-	// Until the game is over 
-	while (!gameover) {
-
-		// Function Call 
-		draw();
-		input();
-		logic();
-	}
+	 
 }
