@@ -8,8 +8,18 @@
 
 int i, j, height = 20, width = 20;
 int gameover, score;
-int x, y, fruitx, fruity, flag;
-void game_draw();
+int x, y, fruitx, fruity, rot_fr_x, rot_fr_y, flag;
+int length;
+
+// x, y 좌표를 감지하는 방식이 int값에서 구조체로 변경했기 때문에
+//x, y 좌표를 감지하려면 (구조체 이름).x 같은 식으로 접근해야함
+typedef struct {
+	int x, y;
+} Point;
+
+Point snake[400]; // 뱀 몸 길이 최대 400
+
+void game_draw(); // 함수 선언먼저 해두기(게임실행함수)
 
 void SetColor(int color) {			//컬러 지정(크롤링)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -45,13 +55,13 @@ void start_screen_print() {	//시작화면 출력
 	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 	gotoxy(21, 4); printf("SNAKE 게임 ");
 	gotoxy(12, 7); printf("계속하려면 아무키나 눌러주세요.");
-	
+
 
 	int start_input = 0;
 	while (1) {
 		start_input = _getch();		//아무 입력을 받아옵니다
 		if (start_input >= 1) {		//무슨 입력을 받던 간에 start_input은 1보다 커지게 되있습니다
-			system("cls");	
+			system("cls");
 			start_input = 0;			//i 초기화
 			break;
 		}
@@ -150,8 +160,8 @@ void gameover_print(int score) {	//게임 오버시 최종점수 저장
 	gotoxy(21, 2); printf("GAME OVER");
 	gotoxy(19, 4); printf("최종 점수 : %d", score);
 	gotoxy(12, 6); printf("계속하려면 X 키를 눌러주세요.");
-	
-	
+
+
 	while (1) {
 		int go_input = 0;
 		go_input = _getch();
@@ -167,20 +177,33 @@ void gameover_print(int score) {	//게임 오버시 최종점수 저장
 void setup()
 {
 	gameover = 0;
+	length = 2; // 초기 몸 길이
+	flag = 0; // 초기 방향
 
 	// Stores height and width 
-	x = height / 2;
-	y = width / 2;
+	snake[0].x = width / 2; // 초기 뱀 x위치
+	snake[0].y = height / 2; // 초기 뱀 y위치
 
 	fruitx = 0;
 	while (fruitx == 0) {
-		fruitx = rand() % 19;
+		fruitx = rand() % 19;	//이하 rand 전부 19로 수정(벽에 생성되는걸 막기위함)
 	}
 
 	fruity = 0;
 	while (fruity == 0) {
 		fruity = rand() % 19;
 	}
+
+	rot_fr_x = 0;
+	while (rot_fr_x == 0) {
+		rot_fr_x = rand() % 19;
+	}
+
+	rot_fr_y = 0;
+	while (rot_fr_y == 0) {
+		rot_fr_y = rand() % 19;
+	}
+
 
 	score = 0;
 }
@@ -190,21 +213,38 @@ void draw()
 {
 	//system("cls");	화면을 계속 지우며 벽, 과일, 플레이어를 출력(이녀석이 화면을 깜빡이게 하는 원인)
 	gotoxy(0, 0); //크롤링 해온 gotoxy 함수를 통해 화면을 지우지 않고 그대로 덮어씌우는 형식으로 작동하게 하여 화면 버퍼링을 없애준다.
+
 	for (i = 0; i < height; i++) {
 		for (j = 0; j < width; j++) {
-			if (i == 0 || i == width - 1) 
-				printf("ㅡ");
-			else if (j == 0 || j == height - 1) {
-				printf("ㅣ");
+			if (i == 0 || i == width - 1
+				|| j == 0
+				|| j == height - 1) {
+				printf("#");
 			}
 			else {
-				if (i == x && j == y)
-					printf("0");
-				else if (i == fruitx
-					&& j == fruity)
-					printf("!");
-				else
-					printf("　");
+				int tri = 0; // 몸을 출력했는지 확인용 트리거
+
+				for (int r = 0; r < length; r++) { // 몸 길이 만큼 반복해서 몸 길이 만큼 출력
+					if (snake[r].x == i && snake[r].y == j) { // 뱀 좌표와 같다면 출력
+						printf("0");
+						tri = 1; // 몸을 출력했으니 트리거가 1이 됨
+						break;
+					}
+				}
+
+				if (tri == 0) { // 몸이 출력되지 않았을 때 다른 걸 출력함
+					if (i == fruitx
+						&& j == fruity)
+						printf("*");
+					else if (i == rot_fr_x
+						&& j == rot_fr_y)
+						printf("?");
+					else
+						printf(" ");
+
+				}
+
+
 			}
 		}
 		printf("\n");
@@ -223,15 +263,19 @@ void input()
 	if (_kbhit()) {
 		switch (getch()) {
 		case 'a':
+			if (flag == 3) break; // 정반대 방향으로 이동하지 못 함
 			flag = 1;
 			break;
 		case 's':
+			if (flag == 4) break; // 정반대 방향으로 이동하지 못 함
 			flag = 2;
 			break;
 		case 'd':
+			if (flag == 1) break; // 정반대 방향으로 이동하지 못 함
 			flag = 3;
 			break;
 		case 'w':
+			if (flag == 2) break; // 정반대 방향으로 이동하지 못 함
 			flag = 4;
 			break;
 		case 'x':
@@ -245,51 +289,84 @@ void input()
 // each movement 
 void logic()
 {
-	Sleep(100);
+	Sleep(200);
+
+	Point newHead = snake[0]; // 새로운 머리의 좌표를 구하기 위해 새로운 구조체를 선언함
 	switch (flag) {
 	case 1:
-		y--;
+		newHead.y--; // 새로운 머리가 구조체니까 구조체로 접근함
 		break;
 	case 2:
-		x++;
+		newHead.x++;
 		break;
 	case 3:
-		y++;
+		newHead.y++;
 		break;
 	case 4:
-		x--;
+		newHead.x--;
 		break;
 	default:
 		break;
 	}
 
-	// If the game is over 
-	if (x < 0 || x > height
-		|| y < 0 || y > width) {
-		gameover_print(score);
-		gameover = 1;
+	// 본인 몸에 박으면 게임오버
+	if (flag != 0) { // 맨 처음 시작할 때 게임오버 되지 않게 하기 위함
+		for (int i = 0; i < length; i++) { // 현재 몸 길이 만큼 반복
+			if (snake[i].x == newHead.x && snake[i].y == newHead.y) { // 현재 뱀 위치(몸통)과 새로운 머리와 좌표가 같으면 게임오버
+				gameover_print(score);
+				return;
+			}
+		}
 	}
-	//	뱀이 과일 섭취시
-	// 점수 업데이트
-	if (x == fruitx && y == fruity) {
+	//몸이 몸 길이 만큼 한 칸씩 뒤로 밀림
+	for (int i = length; i > 0; i--) {
+		snake[i] = snake[i - 1];
+	}
 
+	//머리는 새로 갱신된 머리로 바뀜
+	snake[0] = newHead;
+
+	// 각종 판정은 머리를 기준으로 하기 때문에 newHead를 기준으로 함
+	// If the game is over (벽에 박을떄)
+	if (newHead.x < 0 || newHead.x > height
+		|| newHead.y < 0 || newHead.y > width)
+		gameover_print(score);
+
+	// If snake reaches the fruit 
+	// then update the score (정상적인 과일섭취)
+	if (newHead.x == fruitx && newHead.y == fruity) {
+		length += 1; // 과일을 먹으면 몸 길이가 길어짐
 		fruitx = 0;
 		while (fruitx == 0) {
-			fruitx = rand() % 20;
+			fruitx = rand() % 19;	//20으로 하니까 자꾸 벽이랑 겹쳐서 생성됨
 		}
 
 		fruity = 0;
 		while (fruity == 0) {
-			fruity = rand() % 20;
+			fruity = rand() % 19;	//20으로 하니까 자꾸 벽이랑 겹쳐서 생성됨
 		}
 
 		score += 10;
+	}
+	//썩은 과일 섭취
+	if (newHead.x == rot_fr_x && newHead.y == rot_fr_y) {
+		length += 3; // 썩은 과일은 몸길이를 훨씬 늘어나게함
+		rot_fr_x = 0;
+		while (rot_fr_x == 0) {
+			rot_fr_x = rand() % 19;	//20으로 하니까 자꾸 벽이랑 겹쳐서 생성됨
+		}
+
+		rot_fr_y = 0;
+		while (rot_fr_y == 0) {
+			rot_fr_y = rand() % 19;	//20으로 하니까 자꾸 벽이랑 겹쳐서 생성됨
+		}
+
+		score -= 10;
 	}
 }
 
 void game_draw() {
 	setup();
-	flag = 0;
 	while (1) {
 		// Function Call 
 		draw();
@@ -300,9 +377,8 @@ void game_draw() {
 
 void main()
 {
-	int m, n;
 
 	start_screen_print();
 	main_print();
-	 
+
 }
