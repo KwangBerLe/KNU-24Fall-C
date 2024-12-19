@@ -17,7 +17,7 @@ int length;
 //x, y 좌표를 감지하려면 (구조체 이름).x 같은 식으로 접근해야함
 typedef struct {
 	int x, y;
-} Point;	//gotoxy에서 사용하기 위한 구조체
+} Point;
 
 typedef struct rank_info {
 	char* name;
