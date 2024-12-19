@@ -138,7 +138,8 @@ void main_print() {
 			else if (POS == 1) {
 				system("cls");
 				RankingShow();
-				break;
+				system("cls");
+				main_print();
 			}
 			else if (POS == 2) {
 				quit_game();
@@ -206,6 +207,7 @@ void gameover_print() {	//게임 오버시 최종점수 저장
 		if (go_input == 99) {
 			system("cls");
 			rank_input();
+			system("cls");
 			main_print();
 		}
 	}
@@ -223,7 +225,7 @@ void rank_input(void) {
 	puts("■                                                   ■");
 	puts("■                                                   ■");
 	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
-	gotoxy(20, 4); printf("이름을 입력해주세요 : ");
+	gotoxy(14, 4); printf("이름을 입력해주세요 : ");
 	scanf("%s", player_name);
 
 	// 메모장 열기
@@ -237,13 +239,24 @@ void rank_input(void) {
 	fprintf(file, "%s\t", player_name);
 	fprintf(file, "%d\n", score);
 
-	fclose(file);
+	system("cls");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	gotoxy(20, 4); printf("등록 완료되었습니다.");
 
-	return;
+	Sleep(2000);
+
+	fclose(file);
 }
 //랭크 보여주는 장면(콘솔)
 void RankingShow(void) {
-	system("mode con: cols=50 lines=30");
 	system("title 랭킹 확인");
 
 	FILE* fp = fopen("Rank_List.txt", "rt");
@@ -257,10 +270,10 @@ void RankingShow(void) {
 	lnk->head = NULL;
 	lnk->tail = NULL;
 
-	char tempName[50];
-	int tempScore;
-	while (fscanf(fp, "%s %d", tempName, &tempScore) == 2) {
-		insertData(lnk, tempName, tempScore);
+	char tmp_Name[50];
+	int tmp_Score;
+	while (fscanf(fp, "%s %d", tmp_Name, &tmp_Score) == 2) {
+		insertData(lnk, tmp_Name, tmp_Score);
 	}
 
 	fclose(fp);
@@ -271,7 +284,7 @@ void RankingShow(void) {
 		deleteLastNode(lnk);
 	}
 
-	Sleep(1000);
+	Sleep(2000);
 
 	return;
 }
@@ -435,7 +448,7 @@ void draw()
 
 	// Print the score after the 
 	// game ends 
-	printf("score = %d", score);
+	printf("score = %d \t", score);
 	printf("\n");
 	printf("press X to quit the game");
 }
