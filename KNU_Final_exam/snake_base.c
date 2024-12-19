@@ -255,7 +255,7 @@ void rank_input(void) {
 
 	fclose(file);
 }
-//랭크 보여주는 장면(콘솔)
+//랭크 보여주는 함수(콘솔)
 void RankingShow(void) {
 	system("title 랭킹 확인");
 
@@ -272,7 +272,7 @@ void RankingShow(void) {
 
 	char tmp_Name[50];
 	int tmp_Score;
-	while (fscanf(fp, "%s %d", tmp_Name, &tmp_Score) == 2) {
+	while (fscanf(fp, "%s %d", tmp_Name, &tmp_Score) == 2) {	//읽어들인 데이터의 수가 2일시 insertData 실행
 		insertData(lnk, tmp_Name, tmp_Score);
 	}
 
@@ -344,7 +344,7 @@ void insertData(LINKEDLIST* lnk, char* name, int score) {
 	return;
 }
 
-// 마지막 노드 지우기
+//사용한 노드 지우기
 void deleteLastNode(LINKEDLIST* lnk) {
 	if (lnk->head == NULL) {
 		return;  // No nodes to delete
