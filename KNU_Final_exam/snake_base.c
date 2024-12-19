@@ -1,8 +1,10 @@
 ﻿// C program to build the complete 
 // snake game 
+#define _CRT_SECURE_NO_WARNINGS
 #include <conio.h> 
 #include <stdio.h> 
 #include <stdlib.h> 
+#include <string.h>
 #include <io.h> 
 #include <Windows.h>
 
@@ -15,11 +17,28 @@ int length;
 //x, y 좌표를 감지하려면 (구조체 이름).x 같은 식으로 접근해야함
 typedef struct {
 	int x, y;
-} Point;
+} Point;	//gotoxy에서 사용하기 위한 구조체
+
+typedef struct rank_info {
+	char* name;
+	int score;
+	struct rank_info* next;
+}RNKINFO;
+
+typedef struct list {
+	struct rank_info* cur;
+	struct rank_info* head;
+	struct rank_info* tail;
+}LINKEDLIST;
 
 Point snake[400]; // 뱀 몸 길이 최대 400
 
-void game_draw(); // 함수 선언먼저 해두기(게임실행함수)
+void game_draw();	// 함수 선언먼저 해두기(게임실행함수)
+void rank_input();
+void printScore(LINKEDLIST* lnk);
+void insertData(LINKEDLIST* lnk, char* name, int score);
+void deleteLastNode(LINKEDLIST* lnk);
+void RankingShow(void);
 
 void SetColor(int color) {			//컬러 지정(크롤링)
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
@@ -70,7 +89,16 @@ void start_screen_print() {	//시작화면 출력
 
 void quit_game() {
 	system("cls");
-	gotoxy(25, 6); printf("게임을 종료합니다.");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	gotoxy(19, 6); printf("게임을 종료합니다.");
 	gotoxy(25, 10);
 	gameover = 1;
 	exit(0);
@@ -78,6 +106,7 @@ void quit_game() {
 
 void main_print() {
 	CursorView(0);
+	fflush(stdin);
 	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 	puts("■                                                   ■");
 	puts("■                                                   ■");
@@ -90,7 +119,7 @@ void main_print() {
 	gotoxy(7, 4); printf("새로 하기");
 	gotoxy(21, 4); printf("랭킹 보기");
 	gotoxy(35, 4); printf("게임 종료");
-	gotoxy(6, 7); printf("ENTER : 메뉴선택      방향키 : 메뉴 이동");
+	gotoxy(6, 7); printf("SPACE : 메뉴선택      방향키 : 메뉴 이동");
 
 	int POS = 0;
 	while (1) {
@@ -100,13 +129,17 @@ void main_print() {
 		else if (GetAsyncKeyState(VK_RIGHT))
 			if (POS == 2 || POS == 4) POS = 0;
 			else POS += 1;
-		else if (GetAsyncKeyState(VK_RETURN)) {	//엔터를 눌렀을 때
+		else if (GetAsyncKeyState(VK_SPACE)) {	//스페이스바를 눌렀을 때
 			if (POS == 0) {
 				system("cls");
 				game_draw();
 				break;
 			}
-			//else if (POS == 1) rank_print();
+			else if (POS == 1) {
+				system("cls");
+				RankingShow();
+				break;
+			}
 			else if (POS == 2) {
 				quit_game();
 				gameover = 1;
@@ -146,7 +179,7 @@ void main_print() {
 	}
 }
 
-void gameover_print(int score) {	//게임 오버시 최종점수 저장
+void gameover_print() {	//게임 오버시 최종점수 저장
 	system("cls");
 	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
 	puts("■                                                   ■");
@@ -160,6 +193,7 @@ void gameover_print(int score) {	//게임 오버시 최종점수 저장
 	gotoxy(21, 2); printf("GAME OVER");
 	gotoxy(19, 4); printf("최종 점수 : %d", score);
 	gotoxy(12, 6); printf("계속하려면 X 키를 눌러주세요.");
+	gotoxy(10, 7); printf("랭크를 등록하려면 C키를 눌러주세요.");
 
 
 	while (1) {
@@ -169,7 +203,156 @@ void gameover_print(int score) {	//게임 오버시 최종점수 저장
 			system("cls");
 			main_print();
 		}
+		if (go_input == 99) {
+			system("cls");
+			rank_input();
+			main_print();
+		}
 	}
+}
+
+void rank_input(void) {
+	char player_name[50];
+	system("cls");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■                                                   ■");
+	puts("■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■");
+	gotoxy(20, 4); printf("이름을 입력해주세요 : ");
+	scanf("%s", player_name);
+
+	// 메모장 열기
+	FILE* file = fopen("Rank_List.txt", "a");
+	if (file == NULL) {
+		printf("Error opening file!");
+		return;
+	}
+
+	// 입력받은 이름과 게임 점수 입력하기
+	fprintf(file, "%s\t", player_name);
+	fprintf(file, "%d\n", score);
+
+	fclose(file);
+
+	return;
+}
+//랭크 보여주는 장면(콘솔)
+void RankingShow(void) {
+	system("mode con: cols=50 lines=30");
+	system("title 랭킹 확인");
+
+	FILE* fp = fopen("Rank_List.txt", "rt");
+	if (fp == NULL) {
+		MessageBox(NULL, TEXT("The file does not exist."), NULL, NULL);
+		return;
+	}
+
+	LINKEDLIST* lnk = (LINKEDLIST*)malloc(sizeof(LINKEDLIST));
+	lnk->cur = NULL;
+	lnk->head = NULL;
+	lnk->tail = NULL;
+
+	char tempName[50];
+	int tempScore;
+	while (fscanf(fp, "%s %d", tempName, &tempScore) == 2) {
+		insertData(lnk, tempName, tempScore);
+	}
+
+	fclose(fp);
+
+	printScore(lnk);
+
+	while (lnk->head != NULL) {
+		deleteLastNode(lnk);
+	}
+
+	Sleep(1000);
+
+	return;
+}
+//콘솔에 내림차순으로 print하기
+void printScore(LINKEDLIST* lnk) {
+	int cnt = 0;
+	RNKINFO* cur;
+	cur = lnk->head;
+
+	while (cur != NULL) {
+		cnt++;
+		cur = cur->next;
+	}
+
+	RNKINFO** ptr = (RNKINFO**)malloc(sizeof(RNKINFO*) * cnt);
+	int i, j;
+	RNKINFO* temp;
+
+	for (i = 0, cur = lnk->head; i < cnt; i++) {
+		ptr[i] = cur;
+		if (cur == NULL)
+			break;
+		cur = cur->next;
+	}
+
+	for (i = 0; i < cnt - 1; i++) {
+		for (j = i + 1; j < cnt; j++) {
+			if (ptr[i]->score <= ptr[j]->score) {
+				temp = ptr[i];
+				ptr[i] = ptr[j];
+				ptr[j] = temp;
+			}
+		}
+	}
+
+	for (i = 0; i < cnt; i++) {
+		printf("%d. Name: %s \t\t Score: %d\n", i + 1, ptr[i]->name, ptr[i]->score);
+	}
+
+	free(ptr);
+}
+//메모장 데이터를 노드에 입력하기
+void insertData(LINKEDLIST* lnk, char* name, int score) {
+	RNKINFO* newRNK = (RNKINFO*)malloc(sizeof(RNKINFO));
+	newRNK->name = (char*)malloc(sizeof(char) * (strlen(name) + 1));
+	strcpy(newRNK->name, name);
+	newRNK->score = score;
+	newRNK->next = NULL;
+
+	if (lnk->head == NULL && lnk->tail == NULL) {
+		lnk->head = lnk->tail = newRNK;
+	}
+	else {
+		lnk->tail->next = newRNK;
+		lnk->tail = newRNK;
+	}
+	return;
+}
+
+// 마지막 노드 지우기
+void deleteLastNode(LINKEDLIST* lnk) {
+	if (lnk->head == NULL) {
+		return;  // No nodes to delete
+	}
+	else if (lnk->head == lnk->tail) {
+		// Only one node in the list
+		free(lnk->head->name);
+		free(lnk->head);
+		lnk->head = lnk->tail = NULL;
+	}
+	else {
+		RNKINFO* cur = lnk->head;
+		while (cur->next != lnk->tail) {
+			cur = cur->next;
+		}
+		cur->next = NULL;
+		free(lnk->tail->name);
+		free(lnk->tail);
+		lnk->tail = cur;
+	}
+	return;
 }
 
 // Function to generate the fruit 
